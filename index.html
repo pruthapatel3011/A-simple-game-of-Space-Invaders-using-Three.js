@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Space Invaders - Three.js</title>
+    <style>
+        body { margin: 0;}
+        canvas { width: 100%; height: 100%; }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 24px; 
+        }
+    </style>
+</head>
+<body>
+    <div id="score">Score: <span id="scoreValue">0</span></div>
+    <script type="module">
+
+        // Import the Three.js module
+        import * as THREE from 'https://unpkg.com/three@0.111.0/build/three.module.js';
+
+        // Set up the scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Generate random stars
+        function generateStars() {
+            const stars = [];
+            const numStars = 1000;
+            for (let i = 0; i < numStars; i++) {
+                const star = new THREE.Vector3(
+                    Math.random() * 2000 - 1000,
+                    Math.random() * 2000 - 1000,
+                    Math.random() * 2000 - 1000
+                );
+                stars.push(star);
+            }
+            return stars;
+        }
+
+        // Create points geometry and material for stars
+        const starGeometry = new THREE.BufferGeometry().setFromPoints(generateStars());
+        const starMaterial = new THREE.PointsMaterial({ color: 0xffffff });
+        const starPoints = new THREE.Points(starGeometry, starMaterial);
+        scene.add(starPoints);
+
+        // Create cannon
+        const cannonGeometry = new THREE.BoxGeometry(20, 10, 20);
+        const cannonMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cannon = new THREE.Mesh(cannonGeometry, cannonMaterial);
+        cannon.position.set(0, -200, -50); // Adjust cannon's position
+        scene.add(cannon);
+
+        // Create the body of the alien
+        const alienGeometry = new THREE.ConeGeometry(20, 30, 4);
+        const alienMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const alien = new THREE.Mesh(alienGeometry, alienMaterial);
+        scene.add(alien);
+
+        // Position the alien in the scene
+        alien.position.set(0, 0, -100);
+
+        // Display score
+        let score = 0;
+        const scoreElement = document.getElementById('scoreValue');
+        scoreElement.textContent = score;
+
+        // Set up the camera position
+        camera.position.z = 250;
+
+        // Add lighting to the scene
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight.position.set(1, 1, 1).normalize();
+        scene.add(directionalLight);
+
+        // Render loop
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+
+            // Rotate the alien
+            alien.rotation.y += 0.01;
+        }
+
+        animate();
+    </script>
+</body>
+</html>
